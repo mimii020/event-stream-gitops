@@ -1,7 +1,6 @@
 from processor.normalization import normalize_record
 from processor.validation import validate_record
 from processor.deduplication import build_event_key
-import uuid
 
 def prepare_record(record):
     raw_record = record.copy()
@@ -28,7 +27,7 @@ def prepare_record(record):
 
 def process_records(records):
     canonical_events = {}
-    source_records = {}
+    source_records = []
     quarantined = []
 
     for record in records:
@@ -39,10 +38,7 @@ def process_records(records):
             event_key = results["event_key"]
             normalized_record = results["normalized_record"]
             if event_key not in canonical_events:
-                unique_id = uuid.uuid4()
-                id_str = str(unique_id)
                 canonical_events[event_key] = {
-                    "id": id_str,
                     "name": normalized_record["name"],
                     "venue": normalized_record["venue"],
                     "date": normalized_record["date"]
@@ -51,14 +47,13 @@ def process_records(records):
             source_event_id = normalized_record["source_event_id"]
             source_name = normalized_record["source_name"]
             source_updated_at = normalized_record["source_updated_at"]
-            event_id = canonical_events[event_key]["id"]
             source_key = (source_event_id, source_name)
-            source_records[source_key] = {
+            source_records.append({
                 "source_name": source_name,
                 "source_event_id": source_event_id,
                 "source_updated_at": source_updated_at,
-                "event_id": event_id
-            }
+                "event_key": event_key
+            })
     return {
         "canonical_events": canonical_events,
         "source_records": source_records,
