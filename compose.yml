@@ -10,11 +10,27 @@ services:
       - "127.0.0.1:5433:5432"
     volumes:
       - eventstream_pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U eventstream -d eventstream"]
       interval: 5s
       timeout: 3s
       retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "app.py"]
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: eventstream
+      POSTGRES_USER: eventstream
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventstream_dev_only}
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   eventstream_pgdata:
