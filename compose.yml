@@ -23,11 +23,11 @@ services:
       dockerfile: Dockerfile
     command: ["python", "app.py"]
     environment:
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: eventstream
-      POSTGRES_USER: eventstream
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventstream_dev_only}
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: eventstream
+      DB_USER: eventstream
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-eventstream_dev_only}
     depends_on:
       db:
         condition: service_healthy
