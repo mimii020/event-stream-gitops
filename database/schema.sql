@@ -20,6 +20,6 @@
         source_id INT REFERENCES source(id),
         raw_record JSONB NOT NULL,
         errors JSONB NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         UNIQUE (raw_record, errors)
     );
